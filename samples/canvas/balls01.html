@@ -1,0 +1,86 @@
+<html>
+<head>
+<title>Balls Animation</title>
+</head>
+<body>
+<h1>Balls Animation</h1>
+<canvas id="mycanvas" width="400" height="400"/>
+<script>
+
+function Ball(x, y, dx, dy, radius) {
+    this.x = x;
+    this.y = y;
+    this.dx = dx;
+    this.dy = dy;   
+    this.radius = radius;
+}
+
+Ball.prototype.doMove = function(maxx, maxy) {
+    var newx = this.x + this.dx;
+    var newy = this.y + this.dy;
+    if (newx - this.radius < 0 || newx + this.radius > maxx) {
+        this.dx = -this.dx;
+        newx = this.x + this.dx;
+    }
+    if (newy - this.radius < 0 || newy + this.radius > maxy) {
+        this.dy = -this.dy;
+        newy = this.y + this.dy;
+    }
+    this.x = newx;
+    this.y = newy;
+}
+
+</script>
+
+<script>
+var canvas = document.getElementById("mycanvas");
+var context = canvas.getContext('2d');
+var width = canvas.width;
+var height = canvas.height;
+
+var balls = [];
+var nballs = 40;
+
+for (var k = 0; k < nballs; k++)
+{
+    var ball = new Ball(Math.random()*width, Math.random()*height, Math.random()*10 - 5, Math.random()*10 - 5, 3 + Math.random()*3);
+    balls.push(ball);
+}
+
+drawScene();
+
+doStep();
+
+function doStep()
+{
+    doMove();
+    drawScene();
+    setTimeout(doStep, 50);
+}
+
+function drawScene()
+{
+    context.clearRect(0, 0, width, height);
+    context.beginPath();
+    
+    for (var k = 0; k < nballs; k++) {
+        var ball = balls[k];
+        var x = ball.x % width;
+        var y = ball.y % height;
+        context.arc(x, y, ball.radius, 0, Math.PI * 2, true);
+    }
+    
+    context.closePath();
+    context.fill();
+}
+
+function doMove()
+{
+    for (var k = 0; k < nballs; k++)
+        balls[k].doMove(width, height);
+}
+
+</script>
+
+</body>
+</html>
