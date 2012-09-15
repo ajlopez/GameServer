@@ -1,0 +1,184 @@
+<html>
+<head>
+<title>Isometric</title>
+</head>
+<body>
+<h1>Isometric</h1>
+<a href="#" onclick="centerx -= 0.5; centery += 0.5; drawScene();">Left</a>
+<a href="#" onclick="centerx += 0.5; centery -= 0.5; drawScene();">Right</a>
+<a href="#" onclick="centerx -= 0.5; centery -= 0.5; drawScene();">Up</a>
+<a href="#" onclick="centerx += 0.5; centery += 0.5; drawScene();">Down</a>
+<a href="#" onclick="centerx = initialcenterx; centery = initialcentery; drawScene();">Reset</a>
+<div>
+<canvas id="mycanvas" width="800" height="400"/>
+</div>
+
+<script>
+var canvas = document.getElementById("mycanvas");
+var context = canvas.getContext('2d');
+var canvaswidth = canvas.width;
+var canvasheight = canvas.height;
+
+var drag = false;
+var startx;
+var starty;
+
+var cellwidth = 100;
+var cellheight = 50;
+
+canvas.onmousedown = mouseDown;
+canvas.onmouseup = mouseUp;
+canvas.onmouseout = function() { drag = false; };
+canvas.onmouseover = function() { drag = false; };
+
+// http://luke.breuer.com/tutorial/javascript-drag-and-drop-tutorial.aspx
+// http://javascript.info/tutorial/mouse-events
+
+function mouseDown(e) {
+    // IE
+    if (e == null)
+        e = window.event;
+    // for IE, left click == 1
+    // for Firefox, left click == 0
+    if ((e.button == 1 && window.event != null || 
+        e.button == 0))
+    {
+        startx = e.clientX;
+        starty = e.clientY;
+        drag = true;
+    }
+}
+
+function mouseUp(e) {
+    if (!drag)
+        return;
+    // IE
+    if (e == null)
+        e = window.event;
+    centerx -= (e.clientX - startx)/cellwidth;
+    centery += (e.clientX - startx)/cellwidth;
+    centerx += (starty - e.clientY)/cellheight;
+    centery += (starty - e.clientY)/cellheight;
+    drawScene();
+}
+
+
+var cellimage1 = renderToCanvas(cellwidth, cellheight, function(context) { createCell(context, cellwidth, cellheight, 0, 255, 0) });
+var cellimage2 = renderToCanvas(cellwidth, cellheight, function(context) { createCell(context, cellwidth, cellheight, 0, 127+64, 0) });
+
+var size = 15;
+var initialcenterx = Math.floor(size/2);
+var initialcentery = Math.floor(size/2);
+var centerx = initialcenterx;
+var centery = initialcentery;
+
+var cells = new Array(size);
+
+for (var k = 0, n = cells.length; k < n; k++)
+{
+    cells[k] = new Array(size);
+    for (var j = 0, n2 = cells[k].length; j < n2; j++)
+        if ((k+j)%2)
+            cells[k][j] = cellimage1;
+        else
+            cells[k][j] = cellimage2;
+}    
+
+drawScene();
+
+function drawScene() {
+    context.clearRect(0, 0, canvaswidth, canvasheight);
+
+    for (var k = 0; k <= size + size - 2; k++)
+        for (var j = k; j >= 0; j--) {
+            var x, y;
+            
+            y = j;
+            x = k - j;
+            
+            if (y > size-1 || x > size-1)
+                continue;
+            
+            var cell = cells[x][y];
+            
+            if (!cell)
+                continue;
+                
+            var x2 = x - centerx;
+            var y2 = centery - y;
+            var posx = canvaswidth/2 - cellwidth/2 + (x2+y2) * (cellwidth/2);
+            var posy = canvasheight/2 - cellheight/2 + (x2-y2) * (cellheight/2);
+            context.drawImage(cell, posx, posy);
+        }
+        
+    context.beginPath();
+    context.fillStyle = "rgba(255,255,255,1)";
+
+    for (var k = 0; k <= size + size - 2; k++)
+        for (var j = k; j >= 0; j--) {
+            var x, y;
+            
+            y = j;
+            x = k - j;
+            
+            if (y > size-1 || x > size-1)
+                continue;
+            
+            var x2 = x - centerx;
+            var y2 = centery - y;
+            var posx = canvaswidth/2 - cellwidth/2 + (x2+y2) * (cellwidth/2);
+            var posy = canvasheight/2 - cellheight/2 + (x2-y2) * (cellheight/2);
+            context.fillText((x-initialcenterx) + " " + (initialcentery-y), posx+40, posy+28);
+        }
+        
+    context.fill();    
+    context.closePath();
+}
+
+function renderToCanvas(width, height, renderFunction) {
+    var buffer = document.createElement('canvas');
+    buffer.width = width;
+    buffer.height = height;
+    renderFunction(buffer.getContext('2d'));
+    return buffer;
+};
+
+function createCell(context, width, height, r, g, b)
+{
+    var imagedata = context.getImageData(0, 0, width, height);
+    var data = imagedata.data;
+    
+    for (var y = 0; y < height / 2; y++)
+    {
+        var t = Math.floor(width * y / height);
+        for (var x = width / 2 - t; x < width / 2 + t; x++)
+        {
+            var k = (y * width + x) * 4;
+            data[k] = alterColorLevel(r);
+            data[k + 1] = alterColorLevel(g);
+            data[k + 2] = alterColorLevel(b);
+            data[k + 3] = 255;
+            k = ((height - y -1) * width + x) * 4;
+            data[k] = alterColorLevel(r);
+            data[k + 1] = alterColorLevel(g);
+            data[k + 2] = alterColorLevel(b);
+            data[k + 3] = 255;
+        }
+    }
+    
+    context.putImageData(imagedata, 0, 0);
+}
+
+function alterColorLevel(level)
+{
+    if (!level)
+        return level;
+        
+    return Math.floor(level*(0.75  + Math.random()/4)) % 256;
+    //return Math.floor(level+Math.random()*100-50) % 256;
+}
+
+</script>
+
+</body>
+</html>
