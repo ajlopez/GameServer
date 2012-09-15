@@ -76,13 +76,12 @@ function drawScene()
         var ball = balls[k];
         var x = ball.x % width;
         var y = ball.y % height;
-    context.beginPath();
+        context.beginPath();
         context.fillStyle = ball.rgb;
         context.arc(x, y, ball.radius, 0, Math.PI * 2, true);
-    context.closePath();
-    context.fill();
-    }    
-    
+        context.closePath();
+        context.fill();
+    }        
 }
 
 function doMove()

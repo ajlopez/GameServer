@@ -7,6 +7,10 @@
 <canvas id="mycanvas" width="400" height="400"/>
 <script>
 
+function getRandomColor() {
+    return Math.floor(Math.random() * 256).toString();
+}
+
 function Ball(x, y, z, dx, dy, dz, radius) {
     this.x = x;
     this.y = y;
@@ -15,6 +19,7 @@ function Ball(x, y, z, dx, dy, dz, radius) {
     this.dy = dy;   
     this.dz = dz;
     this.radius = radius;
+    this.rgba = 'rgba('+ getRandomColor() + ', ' + getRandomColor() + ', ' + getRandomColor() + ', 1)';
 }
 
 Ball.prototype.doMove = function(maxx, maxy, maxz) {
@@ -36,6 +41,11 @@ Ball.prototype.doMove = function(maxx, maxy, maxz) {
     this.x = newx;
     this.y = newy;
     this.z = newz;
+    
+    if (Math.random() > 0.8) {
+        this.dx = Math.random()*10 - 5;
+        this.dy = Math.random()*10 - 5;
+    }
 }
 
 </script>
@@ -52,7 +62,7 @@ var nballs = 40;
 
 for (var k = 0; k < nballs; k++)
 {
-    var ball = new Ball(Math.random()*width, Math.random()*height, Math.random()*depth, Math.random()*10 - 5, Math.random()*10 - 5, Math.random()*10 - 5, 3 + Math.random()*3);
+    var ball = new Ball(Math.random()*(width-20)+10, Math.random()*(height-20) + 10, Math.random()*depth, Math.random()*10 - 5, Math.random()*10 - 5, Math.random()*10 - 5, 3 + Math.random()*3);
     balls.push(ball);
 }
 
@@ -70,19 +80,21 @@ function doStep()
 function drawScene()
 {
     context.clearRect(0, 0, width, height);
-    context.beginPath();
+    
+    var sballs = balls.sort(function (b1, b2) { if (b1.z > b2.z) return -1; if (b1.z < b2.z) return 1; return 0; });
     
     for (var k = 0; k < nballs; k++) {
-        var ball = balls[k];
+        var ball = sballs[k];
         var x = ball.x % width;
         var y = ball.y % height;
         var radius = ball.radius;
+        context.beginPath();
         radius = Math.tan(Math.atan(depth / (ball.z + depth/10))) * radius;
+        context.fillStyle = ball.rgba;
         context.arc(x, y, radius, 0, Math.PI * 2, true);
-    }
-    
-    context.closePath();
-    context.fill();
+        context.closePath();
+        context.fill();
+    }    
 }
 
 function doMove()
