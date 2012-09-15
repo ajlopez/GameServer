@@ -1,0 +1,136 @@
+<html>
+<head>
+<title>Isometric</title>
+</head>
+<body>
+<h1>Isometric</h1>
+<a href="#" onclick="centerx -= 0.5; centery += 0.5; drawScene();">Left</a>
+<a href="#" onclick="centerx += 0.5; centery -= 0.5; drawScene();">Right</a>
+<a href="#" onclick="centerx -= 0.5; centery -= 0.5; drawScene();">Up</a>
+<a href="#" onclick="centerx += 0.5; centery += 0.5; drawScene();">Down</a>
+<a href="#" onclick="centerx = 5; centery = 5; drawScene();">Reset</a>
+<div>
+<canvas id="mycanvas" width="400" height="200"/>
+</div>
+
+<script>
+var canvas = document.getElementById("mycanvas");
+var context = canvas.getContext('2d');
+var width = canvas.width;
+var height = canvas.height;
+
+var cellimage1 = renderToCanvas(100, 50, function(context) { createCell(context, 100, 50, 0, 255, 0) });
+var cellimage2 = renderToCanvas(100, 50, function(context) { createCell(context, 100, 50, 255, 0, 127) });
+
+var cells = new Array(11);
+
+for (var k = 0, n = cells.length; k < n; k++)
+{
+    cells[k] = new Array(11);
+    for (var j = 0, n2 = cells[k].length; j < n2; j++)
+        if ((k+j)%2)
+            cells[k][j] = cellimage1;
+        else
+            cells[k][j] = cellimage2;
+}    
+
+var centerx = 5;
+var centery = 5;
+
+drawScene();
+
+function drawScene() {
+    context.clearRect(0, 0, width, height);
+
+    for (var k = 0; k <= 10 + 10; k++)
+        for (var j = k; j >= 0; j--) {
+            var x, y;
+            
+            y = j;
+            x = k - j;
+            
+            if (y > 10 || x > 10)
+                continue;
+            
+            var cell = cells[x][y];
+            
+            if (!cell)
+                continue;
+                
+            var x2 = x - centerx;
+            var y2 = centery - y;
+            var posx = 200 - 50 + (x2+y2) * 50;
+            var posy = 100 - 25 + (x2-y2) * 25;
+            context.drawImage(cell, posx, posy);
+        }
+        
+    context.beginPath();
+    context.fillStyle = "rgba(255,255,255,1)";
+
+    for (var k = 0; k <= 10 + 10; k++)
+        for (var j = k; j >= 0; j--) {
+            var x, y;
+            
+            y = j;
+            x = k - j;
+            
+            if (y > 10 || x > 10)
+                continue;
+            
+            var x2 = x - centerx;
+            var y2 = centery - y;
+            var posx = 200 - 50 + (x2+y2) * 50;
+            var posy = 100 - 25 + (x2-y2) * 25;
+            context.fillText((x-5) + " " + (5-y), posx+40, posy+28);
+        }
+        
+    context.fill();    
+    context.closePath();
+}
+
+function renderToCanvas(width, height, renderFunction) {
+    var buffer = document.createElement('canvas');
+    buffer.width = width;
+    buffer.height = height;
+    renderFunction(buffer.getContext('2d'));
+    return buffer;
+};
+
+function createCell(context, width, height, r, g, b)
+{
+    var imagedata = context.getImageData(0, 0, width, height);
+    var data = imagedata.data;
+    
+    for (var y = 0; y < height / 2; y++)
+    {
+        var t = Math.floor(width * y / height);
+        for (var x = width / 2 - t; x < width / 2 + t; x++)
+        {
+            var k = (y * width + x) * 4;
+            data[k] = alterColorLevel(r);
+            data[k + 1] = alterColorLevel(g);
+            data[k + 2] = alterColorLevel(b);
+            data[k + 3] = 255;
+            k = ((height - y -1) * width + x) * 4;
+            data[k] = alterColorLevel(r);
+            data[k + 1] = alterColorLevel(g);
+            data[k + 2] = alterColorLevel(b);
+            data[k + 3] = 255;
+        }
+    }
+    
+    context.putImageData(imagedata, 0, 0);
+}
+
+function alterColorLevel(level)
+{
+    if (!level)
+        return level;
+        
+    return Math.floor(level*Math.random()) % 256;
+}
+
+</script>
+
+</body>
+</html>
