@@ -15,6 +15,47 @@
 
 <script>
 var canvas = document.getElementById("mycanvas");
+
+var drag = false;
+var startx;
+var starty;
+
+canvas.onmousedown = mouseDown;
+canvas.onmouseup = mouseUp;
+canvas.onmouseout = function() { drag = false; };
+canvas.onmouseover = function() { drag = false; };
+
+// http://luke.breuer.com/tutorial/javascript-drag-and-drop-tutorial.aspx
+// http://javascript.info/tutorial/mouse-events
+
+function mouseDown(e) {
+    // IE
+    if (e == null)
+        e = window.event;
+    // for IE, left click == 1
+    // for Firefox, left click == 0
+    if ((e.button == 1 && window.event != null || 
+        e.button == 0))
+    {
+        startx = e.clientX;
+        starty = e.clientY;
+        drag = true;
+    }
+}
+
+function mouseUp(e) {
+    if (!drag)
+        return;
+    // IE
+    if (e == null)
+        e = window.event;
+    centerx -= (e.clientX - startx)/100;
+    centery += (e.clientX - startx)/100;
+    centerx += (starty - e.clientY)/50;
+    centery += (starty - e.clientY)/50;
+    drawScene();
+}
+
 var context = canvas.getContext('2d');
 var width = canvas.width;
 var height = canvas.height;
