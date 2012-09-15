@@ -1,0 +1,61 @@
+<html>
+<head>
+<title>Image Data</title>
+</head>
+<body>
+<!--
+Based on
+http://www.html5canvastutorials.com/advanced/html5-canvas-get-image-data-tutorial/
+https://developer.mozilla.org/en-US/docs/HTML/Canvas/Pixel_manipulation_with_canvas
+-->
+<h1>Image Data</h1>
+<canvas id="mycanvas" width="400" height="200"/>
+
+<script>
+var canvas = document.getElementById("mycanvas");
+var context = canvas.getContext('2d');
+
+var cellimage = renderToCanvas(100, 50, function(context) { createCell(context, 100, 50) });
+
+for (var x = 0; x <= 400; x += 100)
+    for (var y = 0; y <= 200; y += 50) {
+        context.drawImage(cellimage, x, y);
+        context.drawImage(cellimage, x-50, y-25);
+    }
+    
+// http://kaioa.com/node/103
+
+function renderToCanvas(width, height, renderFunction) {
+    var buffer = document.createElement('canvas');
+    buffer.width = width;
+    buffer.height = height;
+    renderFunction(buffer.getContext('2d'));
+    return buffer;
+};
+
+function createCell(context, width, height)
+{
+    var imagedata = context.getImageData(0, 0, width, height);
+    var data = imagedata.data;
+    
+    for (var y = 0; y < height / 2; y++)
+    {
+        var t = Math.floor(width * y / height);
+        for (var x = width / 2 - t; x < width / 2 + t; x++)
+        {
+            var k = (y * width + x) * 4;
+            data[k + 1] = Math.floor(Math.random() * 128) + 127;
+            data[k + 3] = 255;
+            k = ((height - y -1) * width + x) * 4;
+            data[k + 1] = Math.floor(Math.random() * 128) + 127;
+            data[k + 3] = 255;
+        }
+    }
+    
+    context.putImageData(imagedata, 0, 0);
+}
+
+</script>
+
+</body>
+</html>
