@@ -4,8 +4,12 @@
 </head>
 <body>
 <h1>Balls Animation</h1>
-<canvas id="mycanvas" width="400" height="400"/>
+<canvas id="mycanvas" width="800" height="400"/>
 <script>
+
+function getRandomColor() {
+    return Math.floor(Math.random() * 256).toString();
+}
 
 function Ball(x, y, dx, dy, radius, ddx, ddy) {
     this.x = x;
@@ -15,6 +19,8 @@ function Ball(x, y, dx, dy, radius, ddx, ddy) {
     this.radius = radius;
     this.ddx = ddx;
     this.ddy = ddy;
+    
+    this.rgb = 'rgba('+ getRandomColor() + ', ' + getRandomColor() + ', ' + getRandomColor() + ', 1)';
 }
 
 Ball.prototype.doMove = function(maxx, maxy) {
@@ -43,11 +49,11 @@ var width = canvas.width;
 var height = canvas.height;
 
 var balls = [];
-var nballs = 10;
+var nballs = 50;
 
 for (var k = 0; k < nballs; k++)
 {
-    var ball = new Ball(Math.random()*width, Math.random()*height, 0 /*Math.random()*10 - 5*/, 0 /*Math.random()*10 - 5*/, 3 + Math.random()*10, 0, 0);
+    var ball = new Ball(Math.random()*(width-20)+10, Math.random()*(height-20)+10, 0 /*Math.random()*10 - 5*/, 0 /*Math.random()*10 - 5*/, 3 + Math.random()*10, 0, 0);
     balls.push(ball);
 }
 
@@ -59,23 +65,24 @@ function doStep()
 {
     doMove();
     drawScene();
-    setTimeout(doStep, 50);
+    setTimeout(doStep, 20);
 }
 
 function drawScene()
 {
-    context.clearRect(0, 0, width, height);
-    context.beginPath();
+//    context.clearRect(0, 0, width, height);
     
     for (var k = 0; k < nballs; k++) {
         var ball = balls[k];
         var x = ball.x % width;
         var y = ball.y % height;
+    context.beginPath();
+        context.fillStyle = ball.rgb;
         context.arc(x, y, ball.radius, 0, Math.PI * 2, true);
-    }
-    
     context.closePath();
     context.fill();
+    }    
+    
 }
 
 function doMove()
@@ -97,18 +104,12 @@ function doMove()
             if (distance2 < (ball.radius + ball2.radius) * (ball.radius + ball2.radius))
                 continue;
                 
-            var force = ball.radius * ball2.radius / distance2 * 10;
+            var force = ball.radius * ball2.radius / distance2 * 1;
             
-            var tg = Math.atan(Math.abs(ball2.y - ball.y) / Math.abs(ball2.x - ball.x));
+            var tg = Math.atan2(ball2.y - ball.y, ball2.x - ball.x);
             var forcex = force * Math.cos(tg);
             var forcey = force * Math.sin(tg);
             
-            if (ball2.x < ball.x)
-                forcex = -forcex;
-                
-            if (ball2.y < ball.y)
-                forcey = -forcey;
-                             
             ball.ddx += forcex / ball.radius;
             ball2.ddx -= forcex / ball2.radius;
             
