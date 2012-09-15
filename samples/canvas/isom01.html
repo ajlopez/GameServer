@@ -1,0 +1,111 @@
+<html>
+<head>
+<title>Isometric</title>
+</head>
+<body>
+<h1>Isometric</h1>
+<canvas id="mycanvas" width="400" height="200"/>
+
+<script>
+var canvas = document.getElementById("mycanvas");
+var context = canvas.getContext('2d');
+
+var cellimage1 = renderToCanvas(100, 50, function(context) { createCell(context, 100, 50, 0, 255, 0) });
+var cellimage2 = renderToCanvas(100, 50, function(context) { createCell(context, 100, 50, 255, 0, 127) });
+
+var cells = new Array(11);
+
+for (var k = 0, n = cells.length; k < n; k++)
+{
+    cells[k] = new Array(11);
+    for (var j = 0, n2 = cells[k].length; j < n2; j++)
+        if ((k+j)%2)
+            cells[k][j] = cellimage1;
+        else
+            cells[k][j] = cellimage2;
+}    
+
+for (var k = -4; k <= 4; k++)
+for (var l = 0; l < 2; l++)
+    for (var j = -2; j <= 2; j++) {
+        var x = k + j + 2 + l;
+        var y = (-k + j - 2);
+        if (!cells[x+5] || !cells[x+5][y+5])
+            continue;
+        var cell = cells[x+5][y+5];
+        var posx = 200 - 50 + (x+y) * 50;
+        var posy = 100 - 25 + (x-y) * 25;
+        context.drawImage(cell, posx, posy);
+    }
+
+context.beginPath();
+context.fillStyle = "rgba(255,255,255,1)";
+for (var k = -4; k <= 4; k++)
+for (var l = 0; l < 2; l++)
+    for (var j = -2; j <= 2; j++) {
+        var x = k + j + 2 + l;
+        var y = (-k + j - 2);
+        if (!cells[x+5] || !cells[x+5][y+5])
+            continue;
+        var cell = cells[x+5][y+5];
+        var posx = 200 - 50 + (x+y) * 50;
+        var posy = 100 - 25 + (x-y) * 25;
+        context.fillText(x + " " + y, posx+40, posy+28);
+    }
+    
+context.fill();    
+context.closePath();
+
+/*
+for (var x = 0; x <= 400; x += 100)
+    for (var y = 0; y <= 200; y += 50) {
+        context.drawImage(cellimage1, x, y);
+        context.drawImage(cellimage2, x-50, y-25);
+    }
+*/
+function renderToCanvas(width, height, renderFunction) {
+    var buffer = document.createElement('canvas');
+    buffer.width = width;
+    buffer.height = height;
+    renderFunction(buffer.getContext('2d'));
+    return buffer;
+};
+
+function createCell(context, width, height, r, g, b)
+{
+    var imagedata = context.getImageData(0, 0, width, height);
+    var data = imagedata.data;
+    
+    for (var y = 0; y < height / 2; y++)
+    {
+        var t = Math.floor(width * y / height);
+        for (var x = width / 2 - t; x < width / 2 + t; x++)
+        {
+            var k = (y * width + x) * 4;
+            data[k] = alterColorLevel(r);
+            data[k + 1] = alterColorLevel(g);
+            data[k + 2] = alterColorLevel(b);
+            data[k + 3] = 255;
+            k = ((height - y -1) * width + x) * 4;
+            data[k] = alterColorLevel(r);
+            data[k + 1] = alterColorLevel(g);
+            data[k + 2] = alterColorLevel(b);
+            data[k + 3] = 255;
+        }
+    }
+    
+    context.putImageData(imagedata, 0, 0);
+}
+
+function alterColorLevel(level)
+{
+    if (!level)
+        return level;
+        
+    return Math.floor(level*Math.random()) % 256;
+}
+
+</script>
+
+</body>
+</html>
