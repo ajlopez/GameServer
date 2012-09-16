@@ -49,4 +49,14 @@ assert.equal(2, cell.x);
 assert.equal(3, cell.y);
 assert.equal('green_cell', cell.base);
 
+// Get Cells
+
+for (var x = 0; x < 15; x++)
+    for (var y = 0; y < 15; y++) {
+        cell = world.getCell(x, y);
+        assert.ok(cell);
+        assert.equal(x, cell.x);
+        assert.equal(y, cell.y);
+        assert.equal('green_cell', cell.base);
+    }
 
