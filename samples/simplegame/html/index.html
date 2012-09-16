@@ -18,6 +18,32 @@
 <canvas id="mycanvas" width="800" height="400"/>
 </div>
 <script>
+
+function Ball(x, y, dx, dy) {
+    this.x = x;
+    this.y = y;
+    this.dx = dx;
+    this.dy = dy;    
+}
+
+Ball.prototype.move = function(width, height) {
+    var newx = this.x + this.dx;
+    var newy = this.y + this.dy;
+
+    if (newx < 0 || newx > width) {
+        this.dx = -this.dx;
+        newx = this.x + this.dx;
+    }
+
+    if (newy < 0 || newy > height) {
+        this.dy = -this.dy;
+        newy = this.y + this.dy;
+    }
+    
+    this.x = newx;
+    this.y = newy;
+}
+
 var canvas = document.getElementById("mycanvas");
 var context = canvas.getContext('2d');
 var canvaswidth = canvas.width;
@@ -145,7 +171,17 @@ var initialcentery = Math.floor(ysize/2);
 var centerx = initialcenterx;
 var centery = initialcentery;
 
+var ball = new Ball(0, 0, 0.05, 0);
+
 drawScene();
+
+setTimeout(doStep, 20);
+
+function doStep() {
+    ball.move(world.width, world.height);
+    drawScene();
+    setTimeout(doStep, 20);
+}
 
 function drawScene() {
     context.clearRect(0, 0, canvaswidth, canvasheight);
@@ -168,7 +204,7 @@ function drawScene() {
         
         context.drawImage(element.image, posx, posy);
     }
-        
+    
     context.beginPath();
     context.fillStyle = "rgba(255,255,255,1)";
 
@@ -185,6 +221,15 @@ function drawScene() {
         
     context.fill();    
     context.closePath();
+    
+    context.beginPath();
+    context.fillStyle = "rgba(255,0,0,1)";
+    var ballposition = isoworld.getCellCenterPosition(ball.x, ball.y);
+    var posx = canvaswidth/2 + ballposition.x - centerposition.x - cellwidth/2;
+    var posy = canvasheight/2 + ballposition.y - centerposition.y - cellheight/2;
+    context.arc(posx-5, posy-10, 10, 0, Math.PI*2, true);
+    context.fill();
+    context.closePath();        
 }
 
 
