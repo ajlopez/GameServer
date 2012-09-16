@@ -1,0 +1,47 @@
+<html>
+<head>
+<title>Canvas</title>
+</head>
+<body>
+<h1>Canvas</h1>
+<!--
+    Overlay canvas
+    http://stackoverflow.com/questions/6787899/combining-two-or-more-canvas-elements-with-some-sort-of-blending    
+-->
+<style>
+/* Set to the same width/height as the canvases */
+.canvas-layers { position:relative; width:400px; height:300px }
+.canvas-layers canvas { position:absolute; top:0; left:0 }
+</style>
+
+<div class='canvas-layers'>
+<canvas id="mycanvas1">
+</canvas>
+<canvas id="mycanvas2">
+</canvas>
+</div>
+
+<script>
+
+var canvas1 = document.getElementById("mycanvas1");
+var canvas2 = document.getElementById("mycanvas2");
+
+var context1 = canvas1.getContext("2d");
+var context2 = canvas2.getContext("2d");
+
+context1.beginPath();
+context1.fillStyle = "rgba(255,0,0,1)";
+context1.arc(90, 90, 40, 0, Math.PI * 2, true);
+context1.fill();
+context1.closePath();
+
+context2.beginPath();
+context2.fillStyle = "rgba(0,255,0,1)";
+context2.arc(100, 100, 30, 0, Math.PI * 2, true);
+context2.fill();
+context2.closePath();
+
+</script>
+
+</body>
+</html>
