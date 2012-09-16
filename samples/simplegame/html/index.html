@@ -81,51 +81,39 @@ drawScene();
 
 function drawScene() {
     context.clearRect(0, 0, canvaswidth, canvasheight);
-    var l = isopositions.length
+    var centerposition = isoworld.getCellCenterPosition(centerx, centery);
 
     for (var k = 0, l = isopositions.length; k < l; k++) {
-            var position = isopositions[k];
-            var x, y;
+        var position = isopositions[k];
+        
+        var cell = world.getCell(position.x, position.y);
+        
+        var element = gamedefinition.getElement(cell.base);
+        
+        if (!element)
+            continue;
             
-            y = position.y;
-            x = position.x;
-            
-            var cell = world.getCell(x, y);
-            
-            if (!cell)
-                continue;
-                
-            var element = gamedefinition.getElement(cell.base);
-            
-            if (!element)
-                continue;
-                
-            var x2 = x - centerx;
-            var y2 = centery - y;
-            var posx = canvaswidth/2 - cellwidth/2 + (x2+y2) * (cellwidth/2);
-            var posy = canvasheight/2 - cellheight/2 + (x2-y2) * (cellheight/2);
-            context.drawImage(element.image, posx, posy);
+        var cellposition = isoworld.getCellCenterPosition(position.x, position.y);
+        
+        var posx = canvaswidth/2 + cellposition.x - centerposition.x - cellwidth/2;
+        var posy = canvasheight/2 + cellposition.y - centerposition.y - cellheight/2;
+        
+        context.drawImage(element.image, posx, posy);
     }
         
     context.beginPath();
     context.fillStyle = "rgba(255,255,255,1)";
 
-    for (var k = 0; k <= xsize + ysize - 2; k++)
-        for (var j = k; j >= 0; j--) {
-            var x, y;
-            
-            y = j;
-            x = k - j;
-            
-            if (y > ysize-1 || x > xsize-1)
-                continue;
-            
-            var x2 = x - centerx;
-            var y2 = centery - y;
-            var posx = canvaswidth/2 - cellwidth/2 + (x2+y2) * (cellwidth/2);
-            var posy = canvasheight/2 - cellheight/2 + (x2-y2) * (cellheight/2);
-            context.fillText((x-initialcenterx) + " " + (initialcentery-y), posx+40, posy+28);
-        }
+    for (var k = 0, l = isopositions.length; k < l; k++) {
+        var position = isopositions[k];
+        
+        var cellposition = isoworld.getCellCenterPosition(position.x, position.y);
+        
+        var posx = canvaswidth/2 + cellposition.x - centerposition.x - cellwidth/2;
+        var posy = canvasheight/2 + cellposition.y - centerposition.y - cellheight/2;
+        
+        context.fillText((position.x-initialcenterx) + " " + (initialcentery-position.y), posx+40, posy+28);
+    }
         
     context.fill();    
     context.closePath();
