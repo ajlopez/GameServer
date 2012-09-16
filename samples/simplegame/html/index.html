@@ -2,6 +2,7 @@
 <head>
 <title>Simple Game</title>
 <script src="../../../lib/gameserver.js" type="text/javascript"></script>
+<script src="../../../lib/isometric.js" type="text/javascript"></script>
 <script src="../simplegame.js" type="text/javascript"></script>
 </head>
 <body>
@@ -55,7 +56,6 @@ function mouseUp(e) {
     drawScene();
 }
 
-
 var drag = false;
 var startx;
 var starty;
@@ -63,6 +63,9 @@ var starty;
 var gamedefinition = simplegame.getGameDefinition();
 var game = gamedefinition.createGame();
 var world = game.getWorld();
+
+var isoworld = new isometric.World(world.width, world.height, world.cellwidth, world.cellheight);
+var isopositions = isoworld.getOrderedCellPositions();
 
 var cellwidth = world.cellwidth;
 var cellheight = world.cellheight;
@@ -78,16 +81,14 @@ drawScene();
 
 function drawScene() {
     context.clearRect(0, 0, canvaswidth, canvasheight);
+    var l = isopositions.length
 
-    for (var k = 0; k <= ysize + xsize - 2; k++)
-        for (var j = k; j >= 0; j--) {
+    for (var k = 0, l = isopositions.length; k < l; k++) {
+            var position = isopositions[k];
             var x, y;
             
-            y = j;
-            x = k - j;
-            
-            if (y > ysize-1 || x > xsize-1)
-                continue;
+            y = position.y;
+            x = position.x;
             
             var cell = world.getCell(x, y);
             
@@ -104,7 +105,7 @@ function drawScene() {
             var posx = canvaswidth/2 - cellwidth/2 + (x2+y2) * (cellwidth/2);
             var posy = canvasheight/2 - cellheight/2 + (x2-y2) * (cellheight/2);
             context.drawImage(element.image, posx, posy);
-        }
+    }
         
     context.beginPath();
     context.fillStyle = "rgba(255,255,255,1)";
