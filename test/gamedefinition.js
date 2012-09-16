@@ -15,5 +15,13 @@ var element = new gameserver.Element('house');
 assert.ok(element);
 assert.equal('house', element.name);
 
+// Add Element
 
+gamedef.addElement(element);
+
+var retrieved = gamedef.getElement('house');
+
+assert.equal(element, retrieved);
+
+assert.ok(!gamedef.getElement('unknown'));
 
