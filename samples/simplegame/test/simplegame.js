@@ -39,6 +39,8 @@ var world = game.getWorld();
 assert.ok(world);
 assert.equal(15, world.width);
 assert.equal(15, world.height);
+assert.equal(100, world.cellwidth);
+assert.equal(50, world.cellheight);
 
 // Get Cell
 

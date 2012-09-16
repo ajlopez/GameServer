@@ -1,0 +1,136 @@
+<html>
+<head>
+<title>Simple Game</title>
+<script src="../../../lib/gameserver.js" type="text/javascript"></script>
+<script src="../simplegame.js" type="text/javascript"></script>
+</head>
+<body>
+<h1>Simple Game</h1>
+<div>
+<a href="#" onclick="centerx -= 0.5; centery += 0.5; drawScene();">Left</a>
+<a href="#" onclick="centerx += 0.5; centery -= 0.5; drawScene();">Right</a>
+<a href="#" onclick="centerx -= 0.5; centery -= 0.5; drawScene();">Up</a>
+<a href="#" onclick="centerx += 0.5; centery += 0.5; drawScene();">Down</a>
+<a href="#" onclick="centerx = initialcenterx; centery = initialcentery; drawScene();">Reset</a>
+</div>
+<div>
+<canvas id="mycanvas" width="800" height="400"/>
+</div>
+<script>
+var canvas = document.getElementById("mycanvas");
+var context = canvas.getContext('2d');
+var canvaswidth = canvas.width;
+var canvasheight = canvas.height;
+
+canvas.onmousedown = mouseDown;
+canvas.onmouseup = mouseUp;
+canvas.onmouseout = function() { drag = false; };
+canvas.onmouseover = function() { drag = false; };
+
+function mouseDown(e) {
+    // IE
+    if (e == null)
+        e = window.event;
+    // for IE, left click == 1
+    // for Firefox, left click == 0
+    if ((e.button == 1 && window.event != null || 
+        e.button == 0))
+    {
+        startx = e.clientX;
+        starty = e.clientY;
+        drag = true;
+    }
+}
+
+function mouseUp(e) {
+    if (!drag)
+        return;
+    // IE
+    if (e == null)
+        e = window.event;
+    centerx -= (e.clientX - startx)/cellwidth;
+    centery += (e.clientX - startx)/cellwidth;
+    centerx += (starty - e.clientY)/cellheight;
+    centery += (starty - e.clientY)/cellheight;
+    drawScene();
+}
+
+
+var drag = false;
+var startx;
+var starty;
+
+var gamedefinition = simplegame.getGameDefinition();
+var game = gamedefinition.createGame();
+var world = game.getWorld();
+
+var cellwidth = world.cellwidth;
+var cellheight = world.cellheight;
+
+var xsize = world.width;
+var ysize = world.height;
+var initialcenterx = Math.floor(xsize/2);
+var initialcentery = Math.floor(ysize/2);
+var centerx = initialcenterx;
+var centery = initialcentery;
+
+drawScene();
+
+function drawScene() {
+    context.clearRect(0, 0, canvaswidth, canvasheight);
+
+    for (var k = 0; k <= ysize + xsize - 2; k++)
+        for (var j = k; j >= 0; j--) {
+            var x, y;
+            
+            y = j;
+            x = k - j;
+            
+            if (y > ysize-1 || x > xsize-1)
+                continue;
+            
+            var cell = world.getCell(x, y);
+            
+            if (!cell)
+                continue;
+                
+            var element = gamedefinition.getElement(cell.base);
+            
+            if (!element)
+                continue;
+                
+            var x2 = x - centerx;
+            var y2 = centery - y;
+            var posx = canvaswidth/2 - cellwidth/2 + (x2+y2) * (cellwidth/2);
+            var posy = canvasheight/2 - cellheight/2 + (x2-y2) * (cellheight/2);
+            context.drawImage(element.image, posx, posy);
+        }
+        
+    context.beginPath();
+    context.fillStyle = "rgba(255,255,255,1)";
+
+    for (var k = 0; k <= xsize + ysize - 2; k++)
+        for (var j = k; j >= 0; j--) {
+            var x, y;
+            
+            y = j;
+            x = k - j;
+            
+            if (y > ysize-1 || x > xsize-1)
+                continue;
+            
+            var x2 = x - centerx;
+            var y2 = centery - y;
+            var posx = canvaswidth/2 - cellwidth/2 + (x2+y2) * (cellwidth/2);
+            var posy = canvasheight/2 - cellheight/2 + (x2-y2) * (cellheight/2);
+            context.fillText((x-initialcenterx) + " " + (initialcentery-y), posx+40, posy+28);
+        }
+        
+    context.fill();    
+    context.closePath();
+}
+
+
+</script>
+</body>
+</html>
