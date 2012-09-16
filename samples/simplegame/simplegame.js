@@ -15,9 +15,18 @@ var simplegame = (function() {
         gdef.addElement(defworld);
         var greencell = new gameserver.Element('green_cell');
         gdef.addElement(greencell);
+        gdef.createGame = function() {
+            var game = new gameserver.Game(gdef);
+            var world = game.createWorld(defworld.width, defworld.height);
+            for (var x = 0; x < defworld.width; x++)
+                for (var y = 0; y < defworld.height; y++)
+                    world.createCell(x, y, 'green_cell');
+            
+            return game;
+        };
         return gdef;
     }
-    
+        
     return {
         getGameDefinition: getGameDefinition
     }

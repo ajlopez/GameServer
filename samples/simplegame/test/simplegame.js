@@ -25,3 +25,28 @@ assert.equal(50, defworld.cellheight);
 var greencell = gamedef.getElement('green_cell');
 
 assert.ok(greencell);
+
+// Create Game
+
+var game = gamedef.createGame();
+
+assert.ok(game);
+
+// Get Default World
+
+var world = game.getWorld();
+
+assert.ok(world);
+assert.equal(15, world.width);
+assert.equal(15, world.height);
+
+// Get Cell
+
+var cell = world.getCell(2, 3);
+
+assert.ok(cell);
+assert.equal(2, cell.x);
+assert.equal(3, cell.y);
+assert.equal('green_cell', cell.base);
+
+
