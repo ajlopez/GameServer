@@ -23,11 +23,14 @@ var context = canvas.getContext('2d');
 var canvaswidth = canvas.width;
 var canvasheight = canvas.height;
 
-canvas.onclick = click;
+var drag = false;
+var moved = false;
+
 canvas.onmousedown = mouseDown;
 canvas.onmouseup = mouseUp;
 canvas.onmouseout = function() { drag = false; };
 canvas.onmouseover = function() { drag = false; };
+canvas.onmousemove = mouseMove;
 
 function mouseDown(e) {
     // IE
@@ -41,7 +44,35 @@ function mouseDown(e) {
         startx = e.clientX;
         starty = e.clientY;
         drag = true;
+        moved = false;
     }
+}
+
+function mouseUp(e) {
+    if (!drag)
+        return;
+    if (!moved) {
+        click(e);
+        return;
+    }
+    // IE
+    if (e == null)
+        e = window.event;
+    centerx -= (e.clientX - startx)/cellwidth;
+    centery += (e.clientX - startx)/cellwidth;
+    centerx += (starty - e.clientY)/cellheight;
+    centery += (starty - e.clientY)/cellheight;
+    drawScene();
+}
+
+function mouseMove(e) {
+    if (!drag || moved)
+        return;
+    // IE
+    if (e == null)
+        e = window.event;
+    if (Math.abs(startx - e.clientX) > 2 || Math.abs(starty - e.clientY) > 2)
+        moved = true;
 }
 
 function click(e) {
@@ -57,6 +88,16 @@ function click(e) {
     if (cellcoordinates.x >= 0 && cellcoordinates.x < world.width &&
         cellcoordinates.y >= 0 && cellcoordinates.y < world.height)
         doOperation(cellcoordinates.x, cellcoordinates.y);
+}
+
+function doOperation(x, y)
+{
+    var cell = world.getCell(x, y);
+    if (cell.base == "green_cell")
+        cell.base = "blue_cell";
+    else
+        cell.base = "green_cell";
+    drawScene();
 }
 
 function getPosition(e, canvas) {
@@ -84,20 +125,6 @@ function getPosition(e, canvas) {
     return { x: x, y: y };
 }
 
-function mouseUp(e) {
-    if (!drag)
-        return;
-    // IE
-    if (e == null)
-        e = window.event;
-    centerx -= (e.clientX - startx)/cellwidth;
-    centery += (e.clientX - startx)/cellwidth;
-    centerx += (starty - e.clientY)/cellheight;
-    centery += (starty - e.clientY)/cellheight;
-    drawScene();
-}
-
-var drag = false;
 var startx;
 var starty;
 
