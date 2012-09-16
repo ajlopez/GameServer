@@ -23,6 +23,7 @@ var context = canvas.getContext('2d');
 var canvaswidth = canvas.width;
 var canvasheight = canvas.height;
 
+canvas.onclick = click;
 canvas.onmousedown = mouseDown;
 canvas.onmouseup = mouseUp;
 canvas.onmouseout = function() { drag = false; };
@@ -41,6 +42,46 @@ function mouseDown(e) {
         starty = e.clientY;
         drag = true;
     }
+}
+
+function click(e) {
+    // IE
+    if (e == null)
+        e = window.event;
+    var position = getPosition(e, canvas);
+    var centerposition = isoworld.getCellCenterPosition(centerx, centery);
+    var positionx = position.x - canvaswidth/2 + centerposition.x;
+    var positiony = position.y - canvasheight/2 + centerposition.y;
+    var cellcoordinates = isoworld.getCellCoordinates(positionx, positiony);
+    
+    if (cellcoordinates.x >= 0 && cellcoordinates.x < world.width &&
+        cellcoordinates.y >= 0 && cellcoordinates.y < world.height)
+        doOperation(cellcoordinates.x, cellcoordinates.y);
+}
+
+function getPosition(e, canvas) {
+    if (e.offsetX != undefined && e.offsetY != undefined) {
+        return { x: e.offsetX, y: e.offsetY };
+    }
+
+    var x;
+    var y;
+
+    if (e.x != undefined && e.y != undefined) {
+        x = e.x;
+        y = e.y;
+    }
+    else {
+        x = e.clientX + document.body.scrollLeft +
+              document.documentElement.scrollLeft;
+        y = e.clientY + document.body.scrollTop +
+              document.documentElement.scrollTop;
+    }
+
+    x -= canvas.offsetLeft;
+    y -= canvas.offsetTop;
+
+    return { x: x, y: y };
 }
 
 function mouseUp(e) {

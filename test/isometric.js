@@ -75,3 +75,11 @@ assert.ok(position);
 assert.equal(0, position.x);
 assert.equal(1, position.y);
 
+for (var x = 0; x < world.width; x++)
+    for (var y = 0; y < world.height; y++) {
+        var centerposition = world.getCellCenterPosition(x,y);
+        var position = world.getCellCoordinates(centerposition.x, centerposition.y);
+        assert.ok(position);
+        assert.equal(x, position.x);
+        assert.equal(y, position.y);
+    }
