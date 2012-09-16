@@ -35,13 +35,15 @@ Ball.prototype.move = function(width, height) {
     
     var newx = this.x + this.dx;
     var newy = this.y + this.dy;
-
-    if (newx < 0 || newx > width - 1) {
+    
+    var cell = world.getCell(Math.floor(newx), Math.floor(newy));
+    
+    if (newx < 0 || newx > width || cell == null || cell.base != 'green_cell') {
         this.dx = -this.dx;
         newx = this.x + this.dx;
     }
 
-    if (newy < 0 || newy > height - 1) {
+    if (newy < 0 || newy > height || cell == null || cell.base != 'green_cell') {
         this.dy = -this.dy;
         newy = this.y + this.dy;
     }
@@ -181,7 +183,7 @@ var balls = [];
 var nballs = 20;
 
 for (var k = 0; k < nballs; k++)
-    balls.push(new Ball(Math.floor(Math.random() * world.width), Math.floor(Math.random() * world.height), (k%2) ? 0.05 : 0, (k%2) ? 0 : 0.05));
+    balls.push(new Ball(Math.floor(Math.random() * world.width) + 0.5, Math.floor(Math.random() * world.height) + 0.5, (k%2) ? 0.05 : 0, (k%2) ? 0 : 0.05));
 
 drawScene();
 
@@ -240,7 +242,7 @@ function drawScene() {
         var ball = balls[n];
         var ballposition = isoworld.getCellCenterPosition(ball.x, ball.y);
         var posx = canvaswidth/2 + ballposition.x - centerposition.x;
-        var posy = canvasheight/2 + ballposition.y - centerposition.y;
+        var posy = canvasheight/2 + ballposition.y - centerposition.y - cellheight/2;
         context.arc(posx, posy-10, 10, 0, Math.PI*2, true);
     }
     
