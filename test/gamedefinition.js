@@ -23,5 +23,7 @@ var retrieved = gamedef.getElement('house');
 
 assert.equal(element, retrieved);
 
+// Retrieve Unknown Element
+
 assert.ok(!gamedef.getElement('unknown'));
 
