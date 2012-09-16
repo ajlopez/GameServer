@@ -43,3 +43,35 @@ assert.equal(1, cells[1].y);
 assert.equal(1, cells[2].x);
 assert.equal(0, cells[2].y);
 
+// Get Cell Coordinates from Position
+
+var position = world.getCellCoordinates(0, 25);
+assert.ok(position);
+assert.equal(0, position.x);
+assert.equal(0, position.y);
+
+var position = world.getCellCoordinates(0, 10);
+assert.ok(position);
+assert.equal(0, position.x);
+assert.equal(0, position.y);
+
+var position = world.getCellCoordinates(-5, 5);
+assert.ok(position);
+assert.equal(0, position.x);
+assert.equal(0, position.y);
+
+var position = world.getCellCoordinates(5, 5);
+assert.ok(position);
+assert.equal(0, position.x);
+assert.equal(0, position.y);
+
+var position = world.getCellCoordinates(0, -5);
+assert.ok(position);
+assert.equal(-1, position.x);
+assert.equal(-1, position.y);
+
+var position = world.getCellCoordinates(-50, 55);
+assert.ok(position);
+assert.equal(0, position.x);
+assert.equal(1, position.y);
+
