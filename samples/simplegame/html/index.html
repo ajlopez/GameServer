@@ -27,15 +27,21 @@ function Ball(x, y, dx, dy) {
 }
 
 Ball.prototype.move = function(width, height) {
+    if (Math.random() > 0.95) {
+        var aux = this.dx;
+        this.dx = this.dy;
+        this.dy = aux;
+    }
+    
     var newx = this.x + this.dx;
     var newy = this.y + this.dy;
 
-    if (newx < 0 || newx > width) {
+    if (newx < 0 || newx > width - 1) {
         this.dx = -this.dx;
         newx = this.x + this.dx;
     }
 
-    if (newy < 0 || newy > height) {
+    if (newy < 0 || newy > height - 1) {
         this.dy = -this.dy;
         newy = this.y + this.dy;
     }
@@ -171,16 +177,21 @@ var initialcentery = Math.floor(ysize/2);
 var centerx = initialcenterx;
 var centery = initialcentery;
 
-var ball = new Ball(0, 0, 0.05, 0);
+var balls = [];
+var nballs = 20;
+
+for (var k = 0; k < nballs; k++)
+    balls.push(new Ball(Math.floor(Math.random() * world.width), Math.floor(Math.random() * world.height), (k%2) ? 0.05 : 0, (k%2) ? 0 : 0.05));
 
 drawScene();
 
-setTimeout(doStep, 20);
+setTimeout(doStep, 50);
 
 function doStep() {
-    ball.move(world.width, world.height);
+    for (var n = 0; n < nballs; n++)
+        balls[n].move(world.width, world.height);
     drawScene();
-    setTimeout(doStep, 20);
+    setTimeout(doStep, 50);
 }
 
 function drawScene() {
@@ -224,10 +235,15 @@ function drawScene() {
     
     context.beginPath();
     context.fillStyle = "rgba(255,0,0,1)";
-    var ballposition = isoworld.getCellCenterPosition(ball.x, ball.y);
-    var posx = canvaswidth/2 + ballposition.x - centerposition.x - cellwidth/2;
-    var posy = canvasheight/2 + ballposition.y - centerposition.y - cellheight/2;
-    context.arc(posx-5, posy-10, 10, 0, Math.PI*2, true);
+    
+    for (var n = 0; n < nballs; n++) {
+        var ball = balls[n];
+        var ballposition = isoworld.getCellCenterPosition(ball.x, ball.y);
+        var posx = canvaswidth/2 + ballposition.x - centerposition.x;
+        var posy = canvasheight/2 + ballposition.y - centerposition.y;
+        context.arc(posx, posy-10, 10, 0, Math.PI*2, true);
+    }
+    
     context.fill();
     context.closePath();        
 }
