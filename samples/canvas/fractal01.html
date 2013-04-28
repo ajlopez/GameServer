@@ -123,7 +123,7 @@ function getValue(realc, imaginaryc, maxiter, maxmagsquared)
 
 	while ((value < maxiter) && (realz2 + imaginaryz2 < maxmagsquared))
 	{
-		realz2 = realz * realz2;
+		realz2 = realz * realz;
 		imaginaryz2 = imaginaryz * imaginaryz;
 		imaginaryz = 2 * imaginaryz * realz + imaginaryc;
 		realz = realz2 - imaginaryz2 + realc;
