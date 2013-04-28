@@ -1,0 +1,139 @@
+<html>
+<head>
+<title>Fractal Rendering</title>
+</head>
+<body>
+<h1>Fractal Rendering</h1>
+<canvas id="mycanvas" width="600" height="600"/>
+<script>
+
+function getRandomColor() {
+    return Math.floor(Math.random() * 256).toString();
+}
+
+var ncolors = 2000;
+var colors = [];
+
+function generateColors(colors, ncolors) {
+	var rcolor = getRandomColor();
+	var gcolor = getRandomColor();
+	var bcolor = getRandomColor();
+	
+	for (var k = 0; k < ncolors; k++)
+		colors[k] = [ (k + rcolor) % 256, (k + gcolor) % 256, (k + bcolor) % 256 ];
+}
+
+</script>
+
+<script>
+
+generateColors(colors, ncolors);
+var canvas = document.getElementById("mycanvas");
+var width = canvas.width;
+var height = canvas.height;
+var ctx = canvas.getContext("2d");
+var canvasData = ctx.getImageData(0, 0, width, height);
+
+// http://stackoverflow.com/questions/7812514/drawing-a-dot-on-html5-canvas
+// That's how you define the value of a pixel //
+function drawPixel (x, y, r, g, b, a) {
+    var index = (x + y * width) * 4;
+
+    canvasData.data[index + 0] = r;
+    canvasData.data[index + 1] = g;
+    canvasData.data[index + 2] = b;
+    canvasData.data[index + 3] = a;
+}
+
+// That's how you update the canvas, so that your //
+// modification are taken in consideration //
+function updateCanvas() {
+    ctx.putImageData(canvasData, 0, 0);
+}
+
+for (var x = 0; x < width; x++)
+	for (var y = 0; y < height; y++) {
+		var position = y * width + x;
+		position = position % ncolors;
+		drawPixel(x, y, colors[position][0], colors[position][1], colors[position][2], 255);
+	}
+		
+		
+updateCanvas();
+
+function calculate(width, height, realcenter, imgcenter, realdelta, imgdelta) {
+	var realwidth = realdelta * width;
+	var imgheight = imgdelta * height;
+
+	var realmin = realcenter - realwidth / 2;
+	var imgmin = imgcenter - imgheight / 2;
+
+	var sectorinfo = {
+		fromx: 0,
+		fromy: 0,
+		width: width,
+		height: height,
+		realminimum: realmin,
+		imgminimum: imgmin,
+		delta: realdelta,
+		maxiterations: colors.length,
+		maxvalue: 4
+	};
+
+	return calculateSector(sectorinfo);
+}
+
+var sector = calculate(width, height, 0, 0, 0.01, 0.01);
+
+for (var x = 0; x < sector.width; x++)
+	for (var y = 0; y < sector.height; y++) {
+		var value = sector.values[y * sector.width + x];
+		var color = colors[value];
+		drawPixel(x + sector.fromx, y + sector.fromy, color[0], color[1], color[2], 255);
+	}
+
+updateCanvas();	
+
+function calculateSector(sectorinfo)
+{
+	var values = [];
+
+	for (var x = 0; x < sectorinfo.width; x++)
+		for (var y = 0; y < sectorinfo.height; y++)
+			values[y * sectorinfo.width + x] = getValue(sectorinfo.realminimum + (x + sectorinfo.fromx) * sectorinfo.delta, sectorinfo.imgminimum + (y + sectorinfo.fromy) * sectorinfo.delta, sectorinfo.maxiterations - 1, sectorinfo.maxvalue);
+
+	var sector = {
+		fromx: sectorinfo.fromx,
+		fromy: sectorinfo.fromy,
+		width: sectorinfo.width,
+		height: sectorinfo.height,
+		values: values
+	};
+
+	return sector;
+}
+
+function getValue(realc, imaginaryc, maxiter, maxmagsquared)
+{
+	var realz = 0;
+	var imaginaryz = 0;
+	var realz2 = 0;
+	var imaginaryz2 = 0;
+	var value = 0;
+
+	while ((value < maxiter) && (realz2 + imaginaryz2 < maxmagsquared))
+	{
+		realz2 = realz * realz2;
+		imaginaryz2 = imaginaryz * imaginaryz;
+		imaginaryz = 2 * imaginaryz * realz + imaginaryc;
+		realz = realz2 - imaginaryz2 + realc;
+		value++;
+	}
+	
+	return value;
+}
+
+</script>
+
+</body>
+</html>
